@@ -4,6 +4,8 @@
 
 Open the ESP LAN address, log in, then choose **Settings → Firmware OTA → Check updates → Update over Wi-Fi**. Use this path for normal upgrades; it preserves the existing settings/rules/filter formats. Keep power connected until the ESP restarts and shows the new version. The separate OTA BIN is for manual app upload, not a complete first installation.
 
+If power or the network interrupts the download, the update does not resume automatically. Reconnect, check the running version and your rules/lists, then start the update again with stable power. A message that the requested build was not confirmed does not by itself prove rollback. Query Log stores only the latest 300 events in RAM and resets on reboot; this does not mean persistent rules/lists were deleted.
+
 ## First USB installation
 
 1. Use **ESP32-C6 / 16 MB flash**. Connect it to your computer with a USB data cable. Back up an existing device before first flashing.
