@@ -1,0 +1,17 @@
+menu "C6 Guard"
+config GUARD_SETUP_AP_PASSWORD
+    string "Public setup AP join key (not the admin password)"
+    default "12345678"
+    help
+        Public bootstrap key for first setup and physical BOOT
+        recovery. This is not a secret or administrative credential. Every
+        configuration action after enrollment still requires the owner's admin.
+config GUARD_LED_GPIO
+    int "Onboard WS2812 RGB data GPIO (-1 disables LED)"
+    range -1 30
+    default -1
+    help
+        Set only after confirming the exact board schematic and GRB WS2812 LED.
+        Do not guess or use the BOOT/USB pins. No external wiring is required
+        for a supported onboard LED. LED failure never blocks DNS startup.
+endmenu

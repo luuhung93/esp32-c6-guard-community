@@ -1,0 +1,10 @@
+AdAway default blocklist
+Copyright / attribution: Kicelo, Dominik Schuermann and the AdAway contributors.
+Project and contributor history: https://github.com/AdAway/adaway.github.io/
+Original source: https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt
+License declared in original hosts header: Creative Commons Attribution 3.0 Unported.
+License and full legal terms: https://creativecommons.org/licenses/by/3.0/
+
+ESP32-C6 Guard parses the DNS hostnames, removes exact duplicates and converts them
+into sorted SHA-256-prefix hashes. Original source snapshots and this attribution
+are retained alongside the binary. No endorsement by AdAway is implied.

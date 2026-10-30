@@ -1,0 +1,14 @@
+{
+  "name": "c6-guard-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "~3.4.19",
+    "vite": "^8.3.5"
+  }
+}

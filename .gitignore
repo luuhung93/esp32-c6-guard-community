@@ -1,0 +1,14 @@
+/build*/
+/sdkconfig
+/sdkconfig.old
+/keys/
+/factory/*.bin
+/web/node_modules/
+/web/dist/
+.guard-tools/
+__pycache__/
+*.pyc
+*.pem
+*.key
+*.log
+.DS_Store
