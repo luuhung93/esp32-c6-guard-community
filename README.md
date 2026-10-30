@@ -2,7 +2,7 @@
 
 A small DNS ad/tracker blocker for your local network, with an offline **English / Vietnamese** web interface.
 
-**Author:** [@luuhung93](https://github.com/luuhung93) · **Version:** 0.2.20 Community Beta · **Code:** GPL-3.0-only
+**Author:** [@luuhung93](https://github.com/luuhung93) · **Version:** 0.2.21 Community Beta · **Code:** GPL-3.0-only
 
 ## Download and install
 
