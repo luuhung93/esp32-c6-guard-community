@@ -230,6 +230,7 @@ esp_err_t network_start(const guard_settings_t *s) {
   esp_netif_t *ap = esp_netif_create_default_wifi_ap();
   if (!station || !ap)
     return ESP_ERR_NO_MEM;
+  ESP_ERROR_CHECK(esp_netif_set_hostname(station, "c6-guard"));
   esp_netif_dhcps_stop(ap);
   esp_netif_ip_info_t ap_ip = {0};
   inet_pton(AF_INET, GUARD_AP_IP, &ap_ip.ip);

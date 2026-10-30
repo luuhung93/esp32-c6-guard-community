@@ -2,7 +2,7 @@
 
 A small DNS ad/tracker blocker for your local network, with an offline **English / Vietnamese** web interface.
 
-**Author:** [@luuhung93](https://github.com/luuhung93) · **Version:** 0.2.21 Community Beta · **Code:** GPL-3.0-only
+**Author:** [@luuhung93](https://github.com/luuhung93) · **Version:** 0.2.22 Community Beta · **Code:** GPL-3.0-only
 
 ## Download and install
 
@@ -20,7 +20,7 @@ Hardware: **ESP32-C6 with 16 MB flash**, 2.4 GHz Wi-Fi. Tested on MuseLab nanoES
 2. Open **http://192.168.8.8**. Select **VI / EN**, then choose an admin password (12–128 characters).
 3. Scan/select your router Wi-Fi and connect. Note the LAN IP shown.
 4. Return your phone/computer to the router network and open the ESP LAN IP. Log in with your admin password.
-5. Reserve the address on your router, or choose an unused static address in Settings. Set the ESP LAN IP as DNS for your intended devices/router.
+5. The ESP advertises the LAN hostname **c6-guard**. Router labels may stay cached until DHCP renews; this does not enable `c6-guard.local` (mDNS). Reserve the address on your router, or choose an unused static address in Settings. Set the ESP LAN IP as DNS for your intended devices/router.
 
 Language selection is saved in the browser. The setup address is available on the ESP Wi-Fi; it is not a fixed alias on every home network. Hold **BOOT for about 3 seconds** to reopen the recovery AP without resetting admin/rules.
 
