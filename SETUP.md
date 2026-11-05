@@ -36,3 +36,11 @@ Hold BOOT for about 3 seconds to reopen recovery Wi-Fi; existing admin credentia
 - Cài mới: giải nén **Setup ZIP**, cài Python 3.10+, chạy `setup.cmd` (Windows) hoặc `python3 setup.py` (Mac/Linux). Nhập **INSTALL**, chọn cổng USB. Công cụ tự tải esptool vào thư mục riêng và kiểm tra đúng ESP32-C6/16 MB trước khi ghi.
 - Sau khi nạp: nối **C6-Guard-... / 12345678**, vào **192.168.8.8**, chọn **VI**, tự đặt mật khẩu admin, quét và chọn Wi-Fi nhà. Sau đó dùng IP LAN router cấp để vào trang quản lý.
 - Giữ nguồn khi nạp/cập nhật. Gói USB ghi firmware và bộ lọc mặc định; hãy backup trước nếu board đã có dữ liệu. Giữ BOOT khoảng 3 giây để mở lại AP khi cần sửa Wi-Fi.
+
+## Device status and automatic recovery / Trạng thái và tự phục hồi
+
+Dashboard shows uptime, free/total allocatable RAM, current CPU clock (MHz) and internal chip temperature. Missing sensor readings show —. CPU frequency is not CPU load; chip temperature is not room temperature. DNS counters and Query Log reset at reboot.
+
+The system watchdog recovers monitored task/CPU stalls. Local UDP/TCP DNS checks request a restart after three consecutive failed checks; they do not depend on Internet access. Flash update jobs defer these DNS checks. A saved budget limits DNS-triggered restarts to three until 15 minutes of successful checks. Recovery status is available through the authenticated status API. Hardware recovery and long-term stability remain beta verification items.
+
+Dashboard hiển thị thời gian chạy, RAM trống/tổng, xung CPU và nhiệt độ chip; không đọc được thì hiện —. Watchdog và giám sát DNS hỗ trợ tự khởi động lại khi bị kẹt, có giới hạn số lần phục hồi DNS. Đây không phải bằng chứng nguyên nhân treo cũ đã được sửa. Giữ nguồn khi cập nhật; bộ đếm và Query Log trong RAM sẽ về đầu sau khởi động lại.

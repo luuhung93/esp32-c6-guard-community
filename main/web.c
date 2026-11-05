@@ -2,6 +2,8 @@
 #include "cJSON.h"
 #include "config.h"
 #include "dns.h"
+#include "device_metrics.h"
+#include "health.h"
 #include "esp_http_server.h"
 #include "esp_random.h"
 #include "esp_system.h"
@@ -446,9 +448,26 @@ static esp_err_t route(httpd_req_t *r) {
     cJSON_AddNumberToObject(o, "uptimeSeconds", esp_timer_get_time() / 1000000);
     cJSON_AddNumberToObject(o, "heap", esp_get_free_heap_size());
     cJSON_AddNumberToObject(o, "minHeap", esp_get_minimum_free_heap_size());
+    device_metrics_t metrics = device_metrics_read();
+    if (!cJSON_AddNumberToObject(o, "heapTotal", metrics.heap_total) ||
+        !(metrics.cpu_mhz ? cJSON_AddNumberToObject(o, "cpuMhz", metrics.cpu_mhz)
+                          : cJSON_AddNullToObject(o, "cpuMhz")) ||
+        !(metrics.temperature_valid
+              ? cJSON_AddNumberToObject(o, "temperatureC", metrics.temperature_c)
+              : cJSON_AddNullToObject(o, "temperatureC"))) {
+      cJSON_Delete(o);
+      return error(r, "503 Service Unavailable", "ESP_ERR_NO_MEM",
+                   "Device metrics unavailable");
+    }
     cJSON_AddBoolToObject(o, "wifi", network_ready());
     cJSON_AddBoolToObject(o, "dns", dns_is_ready());
     cJSON_AddBoolToObject(o, "store", filter_store_ready());
+    const guard_health_record_t *recovery = guard_health_last_recovery();
+    cJSON_AddNumberToObject(o, "resetReason", esp_reset_reason());
+    cJSON_AddNumberToObject(o, "dnsRecoveryBootCount", recovery->reboots);
+    cJSON_AddNumberToObject(o, "lastDnsRecoveryUptime", recovery->uptime_seconds);
+    cJSON_AddNumberToObject(o, "lastDnsRecoveryHeap", recovery->heap);
+    cJSON_AddNumberToObject(o, "lastDnsRecoveryMinHeap", recovery->min_heap);
     return json(r, o);
   }
   if (!strcmp(path, "/api/stats") && r->method == HTTP_GET) {
@@ -659,6 +678,7 @@ static esp_err_t route(httpd_req_t *r) {
   return error(r, "404 Not Found", "NOT_FOUND", "Unknown API route");
 }
 esp_err_t web_start(void) {
+  device_metrics_start();
   boot_id = esp_random();
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
   config.stack_size = 12288;

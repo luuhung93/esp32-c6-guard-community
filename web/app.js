@@ -230,6 +230,28 @@ for (const b of document.querySelectorAll("[data-tab]"))
       }
       await refresh();
     });
+let deviceStatus;
+function drawDeviceStatus() {
+  if (!deviceStatus) return;
+  const s = deviceStatus;
+  const valid = value => typeof value === "number" && Number.isFinite(value) && value >= 0;
+  const kib = value => Math.round(value / 1024 * 10) / 10;
+  let uptime = "—";
+  if (valid(s.uptimeSeconds)) {
+    const seconds = Math.floor(s.uptimeSeconds);
+    const days = Math.floor(seconds / 86400);
+    const clock = [Math.floor(seconds / 3600) % 24, Math.floor(seconds / 60) % 60, seconds % 60]
+      .map(n => String(n).padStart(2, "0")).join(":");
+    uptime = days ? ["uptimeDays", days, clock] : clock;
+  }
+  text($("#device-uptime"), uptime);
+  text($("#device-ram"), valid(s.heap) && valid(s.heapTotal) && s.heapTotal > 0 && s.heap <= s.heapTotal
+    ? ["memoryPair", kib(s.heap), kib(s.heapTotal)] : "—");
+  text($("#device-ram-min"), valid(s.minHeap) ? ["memoryMinimum", kib(s.minHeap)] : "—");
+  text($("#device-cpu"), valid(s.cpuMhz) && s.cpuMhz > 0 ? ["cpuMhz", s.cpuMhz] : "—");
+  text($("#device-temperature"), typeof s.temperatureC === "number" && Number.isFinite(s.temperatureC)
+    ? ["temperatureC", Math.round(s.temperatureC * 10) / 10] : "—");
+}
 let refreshing = false;
 async function refresh() {
   if (refreshing) return;
@@ -248,7 +270,9 @@ async function refreshTab(tab) {
     const s = await api("/api/status");
     const m = await api("/api/stats");
     $("#dns-ip").textContent = s.ip;
-    $("#version").textContent = `v${s.firmware} · heap ${s.heap} B`;
+    $("#version").textContent = typeof s.firmware === "string" ? `v${s.firmware}` : "—";
+    deviceStatus = s;
+    drawDeviceStatus();
     for (const key of ["total", "blocked", "cacheHits", "errors"]) {
       $("#metric-" + key).dataset.number = m[key];
       $("#metric-" + key).textContent = Number(m[key]).toLocaleString(locale());
@@ -639,6 +663,7 @@ $("#upload-firmware").onclick = () =>
 const networkForm = wireNetwork(api, message);
 const refreshFirmware = wireFirmware(api, run, message, session);
 wireLanguage(() => {
+  drawDeviceStatus();
   countryNames = typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames([locale()], {type: "region"}) : null;
   drawFilters();
   drawRules();

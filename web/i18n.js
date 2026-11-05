@@ -27,7 +27,6 @@ const messages = {
   "overview": ["Tổng quan", "Overview"],
   "monitorDnsProcessingAndTraffic": ["Giám sát trạng thái xử lý và lưu lượng phân giải tên miền thời gian thực", "Monitor DNS processing and traffic in real time"],
   "totalQueries": ["Tổng truy vấn", "Total queries"],
-  "sinceStartup": ["Kể từ khi khởi động", "Since startup"],
   "blocked": ["Đã chặn (Blocked)", "Blocked"],
   "cacheHits": ["Bộ nhớ đệm (Cache)", "Cache hits"],
   "errors": ["Lỗi (Errors)", "Errors"],
@@ -234,6 +233,18 @@ const messages = {
   "theRequestedDataWasNot": ["Không tìm thấy dữ liệu được yêu cầu.", "The requested data was not found."],
   "invalidDataOrPasswordThe": ["Dữ liệu hoặc mật khẩu không hợp lệ; yêu cầu chưa được áp dụng.", "Invalid data or password; the request was not applied."],
   "cannotReachTheDeviceOr": ["Không thể kết nối thiết bị hoặc máy chủ. Kiểm tra kết nối rồi thử lại.", "Cannot reach the device or server. Check the connection and retry."],
+  "deviceUptime": ["Thời gian chạy", "Uptime"],
+  "countersSinceRestart": ["Các bộ đếm tính từ lần khởi động này", "Counters cover this device session"],
+  "freeRam": ["RAM trống / tổng", "Free / total RAM"],
+  "cpuFrequency": ["Tần số CPU", "CPU frequency"],
+  "currentClock": ["Xung nhịp hiện tại", "Current clock speed"],
+  "chipTemperature": ["Nhiệt độ chip", "Chip temperature"],
+  "internalSensor": ["Cảm biến bên trong ESP32-C6", "Internal ESP32-C6 sensor"],
+  "uptimeDays": ["{0} ngày {1}", "{0} days {1}"],
+  "memoryPair": ["{0} / {1} KiB", "{0} / {1} KiB"],
+  "memoryMinimum": ["Thấp nhất: {0} KiB trống", "Lowest: {0} KiB free"],
+  "cpuMhz": ["{0} MHz", "{0} MHz"],
+  "temperatureC": ["{0} °C", "{0} °C"],
 };
 
 let language = "vi";

@@ -5,6 +5,7 @@
 #include "filter_store.h"
 #include "firmware_ota.h"
 #include "guard_hash.h"
+#include "health.h"
 #include "my_rules.h"
 #include "network.h"
 #include "nvs_flash.h"
@@ -41,6 +42,7 @@ static void install_starter(void) {
     filter_store_install("guard-starter", GUARD_STORE "/starter.tmp", digest);
 }
 void app_main(void) {
+  ESP_ERROR_CHECK(guard_watchdog_start());
   esp_err_t led = status_led_start();
   if (led != ESP_OK)
     ESP_LOGW("guard", "Status LED unavailable: %s", esp_err_to_name(led));
@@ -50,6 +52,7 @@ void app_main(void) {
              esp_err_to_name(e));
     status_led_set(LED_FAULT, true);
     firmware_ota_confirm(false);
+    guard_watchdog_boot_complete();
     return;
   }
   guard_settings_t settings;
@@ -62,6 +65,7 @@ void app_main(void) {
     ESP_LOGE("guard", "Persistent state invalid; refusing unsafe boot");
     status_led_set(LED_FAULT, true);
     firmware_ota_confirm(false);
+    guard_watchdog_boot_complete();
     return;
   }
   ESP_LOGI("memory", "rules/auth heap=%lu",
@@ -82,10 +86,15 @@ void app_main(void) {
   ESP_LOGI("memory", "DNS heap=%lu", (unsigned long)esp_get_free_heap_size());
   if (filter_store_ready())
     install_starter();
+  e = guard_health_start();
+  if (e != ESP_OK)
+    ESP_LOGE("health", "Monitor unavailable: %s", esp_err_to_name(e));
+  healthy = e == ESP_OK && healthy;
   healthy = web_start() == ESP_OK && healthy;
   ESP_LOGI("guard", "Guard %s heap=%lu min=%lu", GUARD_VERSION,
            (unsigned long)esp_get_free_heap_size(),
            (unsigned long)esp_get_minimum_free_heap_size());
+  guard_watchdog_boot_complete();
   status_led_set(LED_READY, healthy && filter_store_ready());
   status_led_set(LED_FAULT, !healthy || !filter_store_ready());
   firmware_ota_confirm(healthy && filter_store_ready());

@@ -189,7 +189,6 @@
           </div>
           <span class="text-xs font-semibold uppercase tracking-wider text-slate-500" data-i18n="totalQueries">Tổng truy vấn</span>
           <div class="text-3xl font-extrabold text-slate-900 mt-2 font-mono" id="metric-total">—</div>
-          <div class="mt-2 flex items-center text-xs font-medium text-emerald-600 gap-1" data-i18n="sinceStartup">Kể từ khi khởi động</div>
         </div>
 
         <!-- Blocked -->
@@ -199,7 +198,6 @@
           </div>
           <span class="text-xs font-semibold uppercase tracking-wider text-slate-500" data-i18n="blocked">Đã chặn (Blocked)</span>
           <div class="text-3xl font-extrabold text-rose-600 mt-2 font-mono" id="metric-blocked">—</div>
-          <div class="mt-2 text-xs font-medium text-slate-500" data-i18n="sinceStartup">Kể từ khi khởi động</div>
         </div>
 
         <!-- Cache hits -->
@@ -209,7 +207,6 @@
           </div>
           <span class="text-xs font-semibold uppercase tracking-wider text-slate-500" data-i18n="cacheHits">Bộ nhớ đệm (Cache)</span>
           <div class="text-3xl font-extrabold text-slate-900 mt-2 font-mono" id="metric-cacheHits">—</div>
-          <div class="mt-2 text-xs font-medium text-slate-500" data-i18n="sinceStartup">Kể từ khi khởi động</div>
         </div>
 
         <!-- Errors -->
@@ -219,7 +216,29 @@
           </div>
           <span class="text-xs font-semibold uppercase tracking-wider text-slate-500" data-i18n="errors">Lỗi (Errors)</span>
           <div class="text-3xl font-extrabold text-slate-700 mt-2 font-mono" id="metric-errors">—</div>
-          <div class="mt-2 text-xs font-medium text-emerald-600 flex items-center gap-1" data-i18n="sinceStartup">Kể từ khi khởi động</div>
+        </div>
+      </div>
+
+      <div id="device-status" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+        <div class="min-w-0">
+          <p class="text-xs font-semibold text-slate-500" data-i18n="deviceUptime">Thời gian chạy</p>
+          <p id="device-uptime" class="mt-2 font-mono font-semibold text-slate-900 break-words">—</p>
+          <p class="mt-1 text-xs text-slate-500" data-i18n="countersSinceRestart">Các bộ đếm tính từ lần khởi động này</p>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs font-semibold text-slate-500" data-i18n="freeRam">RAM trống / tổng</p>
+          <p id="device-ram" class="mt-2 font-mono font-semibold text-slate-900 break-words">—</p>
+          <p id="device-ram-min" class="mt-1 text-xs text-slate-500">—</p>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs font-semibold text-slate-500" data-i18n="cpuFrequency">Tần số CPU</p>
+          <p id="device-cpu" class="mt-2 font-mono font-semibold text-slate-900">—</p>
+          <p class="mt-1 text-xs text-slate-500" data-i18n="currentClock">Xung nhịp hiện tại</p>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs font-semibold text-slate-500" data-i18n="chipTemperature">Nhiệt độ chip</p>
+          <p id="device-temperature" class="mt-2 font-mono font-semibold text-slate-900">—</p>
+          <p class="mt-1 text-xs text-slate-500" data-i18n="internalSensor">Cảm biến bên trong ESP32-C6</p>
         </div>
       </div>
 
