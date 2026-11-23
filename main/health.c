@@ -18,6 +18,7 @@ guard_health_action_t guard_health_step(guard_health_policy_t *p, bool ok,
 }
 #ifdef ESP_PLATFORM
 #include "dns.h"
+#include "reset_log.h"
 #include "esp_log.h"
 #include "esp_random.h"
 #include "esp_system.h"
@@ -159,6 +160,7 @@ static void monitor(void *unused) {
         if (e == ESP_OK && action == HEALTH_REBOOT) {
           ESP_LOGE("health", "DNS stalled; reboot %lu/3, heap=%lu",
                    (unsigned long)record.reboots, (unsigned long)record.heap);
+          reset_log_checkpoint(RESET_TRIGGER_DNS, policy.failures);
           esp_restart();
         }
         updater_flash_unlock();
@@ -172,6 +174,7 @@ static void monitor(void *unused) {
           policy.reboots = record.reboots;
       }
     }
+    reset_log_checkpoint(RESET_TRIGGER_NONE, policy.failures);
     vTaskDelay(pdMS_TO_TICKS(10000));
   }
 }

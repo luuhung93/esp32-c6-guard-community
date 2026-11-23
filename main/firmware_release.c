@@ -1,6 +1,9 @@
 #include "firmware_release.h"
 #include "update_policy.h"
 #include <math.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 static bool digest(const char *s) {
   if (!s || strlen(s) != 64)
@@ -19,4 +22,27 @@ bool firmware_release_valid(const char *chip, const char *version,
          updater_url_allowed(url) && !strncmp(url, prefix, sizeof(prefix) - 1) &&
          isfinite(bytes) && bytes >= 65536 && bytes <= partition_size &&
          bytes == (size_t)bytes;
+}
+
+static bool version_parts(const char *s, unsigned parts[3]) {
+  if (!s) return false;
+  for (unsigned i = 0; i < 3; i++) {
+    if (*s < '0' || *s > '9') return false;
+    char *end;
+    errno = 0;
+    unsigned long value = strtoul(s, &end, 10);
+    if (errno || value > UINT_MAX || *end != (i == 2 ? '\0' : '.'))
+      return false;
+    parts[i] = (unsigned)value;
+    s = end + (i < 2);
+  }
+  return true;
+}
+bool firmware_release_newer(const char *candidate, const char *current) {
+  unsigned next[3], running[3];
+  if (!version_parts(candidate, next) || !version_parts(current, running))
+    return false;
+  for (unsigned i = 0; i < 3; i++)
+    if (next[i] != running[i]) return next[i] > running[i];
+  return false;
 }

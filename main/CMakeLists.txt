@@ -1,4 +1,4 @@
-idf_component_register(SRCS "app_main.c" "health.c" "device_metrics.c" "status_led.c" "domain.c" "dns_packet.c" "settings.c" "network.c" "dns.c" "dns_cache.c" "statistics.c" "guard_hash.c" "filter.c" "filter_store.c" "my_rules.c" "updater.c" "update_policy.c" "rule_text.c" "web_auth.c" "web_policy.c" "web.c" "firmware_ota.c" "firmware_release.c" "firmware_remote.c"
+idf_component_register(SRCS "app_main.c" "health.c" "reset_log.c" "device_metrics.c" "status_led.c" "domain.c" "dns_packet.c" "settings.c" "network.c" "dns.c" "dns_cache.c" "statistics.c" "guard_hash.c" "filter.c" "filter_store.c" "my_rules.c" "updater.c" "update_policy.c" "rule_text.c" "web_auth.c" "web_policy.c" "web.c" "firmware_ota.c" "firmware_release.c" "firmware_remote.c"
  INCLUDE_DIRS "." REQUIRES nvs_flash esp_wifi esp_netif esp_event esp_http_server esp_http_client esp_timer app_update fatfs mbedtls json esp_driver_gpio esp_driver_rmt esp_driver_tsens lwip esp_system esp_hw_support)
 if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/../web/dist/index.html")
  message(FATAL_ERROR "Build web assets first: npm --prefix web ci && npm --prefix web run build")

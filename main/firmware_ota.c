@@ -1,4 +1,5 @@
 #include "firmware_ota.h"
+#include "reset_log.h"
 #include "cJSON.h"
 #include "esp_app_desc.h"
 #include "esp_log.h"
@@ -14,6 +15,7 @@ static _Atomic bool reboot_pending;
 bool firmware_ota_reboot_pending(void) { return atomic_load(&reboot_pending); }
 static void reboot(void *unused) {
   (void)unused;
+  reset_log_checkpoint(RESET_TRIGGER_OTA, RESET_KEEP_DNS_FAILURES);
   esp_restart();
 }
 esp_err_t firmware_ota_activate(const esp_partition_t *part) {

@@ -660,9 +660,70 @@ $("#upload-firmware").onclick = () =>
       true,
     );
   });
+let resetHistoryData;
+function drawResetHistory() {
+  if (!resetHistoryData) return;
+  text($("#reset-history-status"), resetHistoryData.persisted ? "" : ["resetHistoryNotSaved"]);
+  const list = $("#reset-history-list");
+  list.replaceChildren();
+  if (!resetHistoryData.entries.length) text(list, ["resetHistoryEmpty"]);
+  const reasons = {1: "resetPower", 2: "resetExternal", 3: "resetSoftware",
+    4: "resetPanic", 5: "resetInterruptWdt", 6: "resetTaskWdt", 7: "resetOtherWdt", 9: "resetBrownout"};
+  for (const entry of resetHistoryData.entries.slice(0, 8)) {
+    const cause = entry.resetReason === 3
+      ? ({1: "resetDns", 2: "resetUser", 3: "resetOta"}[entry.trigger] || reasons[3])
+      : reasons[entry.resetReason];
+    const card = document.createElement("div");
+    card.className = "p-3 rounded-xl bg-slate-50 break-words";
+    const title = document.createElement("p");
+    title.className = "font-semibold text-slate-800";
+    title.textContent = t("resetEntry", entry.sequence, cause ? t(cause) : t("resetOther", entry.resetReason));
+    const detail = document.createElement("p");
+    detail.className = "mt-1 text-xs text-slate-600";
+    const snapshot = entry.hasSnapshot && [entry.uptimeSeconds, entry.heap, entry.minHeap]
+      .every(value => typeof value === "number" && Number.isFinite(value) && value >= 0);
+    detail.textContent = snapshot
+      ? t("resetBefore", entry.uptimeSeconds, Math.round(entry.heap / 1024), Math.round(entry.minHeap / 1024))
+      : t("resetNoSnapshot");
+    card.append(title, detail);
+    if (snapshot) {
+      const firmware = document.createElement("p");
+      firmware.className = "mt-1 text-xs text-slate-500 break-all";
+      firmware.textContent = t("resetFirmware", entry.previousFirmware || "—", entry.dnsFailures ?? "—");
+      card.append(firmware);
+    }
+    list.append(card);
+  }
+}
+$("#refresh-reset-history").onclick = () => run(async () => {
+  resetHistoryData = undefined;
+  $("#download-reset-history").disabled = true;
+  $("#reset-history-list").replaceChildren();
+  text($("#reset-history-status"), ["loadingResetHistory"]);
+  try {
+    const result = await api("/api/health/history");
+    if (!Array.isArray(result.entries) || result.entries.some(entry => !entry || typeof entry !== "object"))
+      throw Error("Invalid history");
+    resetHistoryData = result;
+    drawResetHistory();
+    $("#download-reset-history").disabled = false;
+  } catch {
+    text($("#reset-history-status"), ["resetHistoryFailed"]);
+  }
+}, $("#refresh-reset-history"));
+$("#download-reset-history").onclick = () => {
+  if (!resetHistoryData) return;
+  const url = URL.createObjectURL(new Blob([JSON.stringify(resetHistoryData, null, 2)], {type: "application/json"}));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "c6-guard-reset-history.json";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
 const networkForm = wireNetwork(api, message);
 const refreshFirmware = wireFirmware(api, run, message, session);
 wireLanguage(() => {
+  drawResetHistory();
   drawDeviceStatus();
   countryNames = typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames([locale()], {type: "region"}) : null;
   drawFilters();

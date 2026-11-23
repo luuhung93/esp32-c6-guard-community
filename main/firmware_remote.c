@@ -141,7 +141,8 @@ esp_err_t firmware_remote_apply(const char *expected_build) {
   char current[65];
   firmware_ota_build(current);
   if (!selected.checked || !expected_build || strcmp(expected_build, selected.build) ||
-      !strcmp(current, selected.build))
+      !strcmp(current, selected.build) ||
+      !firmware_release_newer(selected.version, esp_app_get_description()->version))
     return ESP_ERR_INVALID_STATE;
   const esp_partition_t *part = esp_ota_get_next_update_partition(NULL);
   if (!part || selected.bytes > part->size)
@@ -180,7 +181,8 @@ cJSON *firmware_remote_json(void) {
   cJSON *o = cJSON_CreateObject();
   if (!o) return NULL;
   if (!cJSON_AddBoolToObject(o, "checked", copy.checked) ||
-      !cJSON_AddBoolToObject(o, "available", copy.checked && strcmp(copy.build, current)) ||
+      !cJSON_AddBoolToObject(o, "available", copy.checked && strcmp(copy.build, current) &&
+        firmware_release_newer(copy.version, esp_app_get_description()->version)) ||
       !cJSON_AddStringToObject(o, "version", copy.version) ||
       !cJSON_AddStringToObject(o, "build", copy.build) ||
       !cJSON_AddStringToObject(o, "currentBuild", current) ||

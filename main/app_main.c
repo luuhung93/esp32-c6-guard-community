@@ -6,6 +6,7 @@
 #include "firmware_ota.h"
 #include "guard_hash.h"
 #include "health.h"
+#include "reset_log.h"
 #include "my_rules.h"
 #include "network.h"
 #include "nvs_flash.h"
@@ -55,6 +56,7 @@ void app_main(void) {
     guard_watchdog_boot_complete();
     return;
   }
+  reset_log_start();
   guard_settings_t settings;
   e = guard_settings_load(&settings);
   if (e != ESP_OK) {

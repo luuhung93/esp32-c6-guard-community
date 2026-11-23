@@ -1,4 +1,5 @@
 #include "web.h"
+#include "reset_log.h"
 #include "cJSON.h"
 #include "config.h"
 #include "dns.h"
@@ -110,6 +111,7 @@ static esp_err_t result(httpd_req_t *r, esp_err_t e) {
 }
 static void reboot(void *unused) {
   (void)unused;
+  reset_log_checkpoint(RESET_TRIGGER_USER, RESET_KEEP_DNS_FAILURES);
   esp_restart();
 }
 static void later_reboot(void) {
@@ -469,6 +471,42 @@ static esp_err_t route(httpd_req_t *r) {
     cJSON_AddNumberToObject(o, "lastDnsRecoveryHeap", recovery->heap);
     cJSON_AddNumberToObject(o, "lastDnsRecoveryMinHeap", recovery->min_heap);
     return json(r, o);
+  }
+  if (!strcmp(path, "/api/health/history") && r->method == HTTP_GET) {
+    const reset_history_t *history = reset_log_history();
+    cJSON *o = cJSON_CreateObject();
+    cJSON *items = o ? cJSON_AddArrayToObject(o, "entries") : NULL;
+    if (!items || !cJSON_AddBoolToObject(o, "persisted", reset_log_persisted()))
+      goto history_allocation_failed;
+    for (uint32_t i = 0; i < history->count; i++) {
+      const reset_entry_t *entry = &history->entries[
+          (history->next + RESET_HISTORY_MAX - 1 - i) % RESET_HISTORY_MAX];
+      bool snapshot = entry->flags & RESET_HAS_SNAPSHOT;
+      cJSON *item = cJSON_CreateObject();
+      if (!item || !cJSON_AddNumberToObject(item, "sequence", entry->sequence) ||
+          !cJSON_AddNumberToObject(item, "resetReason", entry->reset_reason) ||
+          !cJSON_AddNumberToObject(item, "trigger", entry->trigger) ||
+          !cJSON_AddBoolToObject(item, "hasSnapshot", snapshot) ||
+          !(snapshot ? cJSON_AddStringToObject(item, "previousFirmware", entry->firmware)
+                     : cJSON_AddNullToObject(item, "previousFirmware")) ||
+          !(snapshot ? cJSON_AddNumberToObject(item, "uptimeSeconds", entry->uptime_seconds)
+                     : cJSON_AddNullToObject(item, "uptimeSeconds")) ||
+          !(snapshot ? cJSON_AddNumberToObject(item, "heap", entry->heap)
+                     : cJSON_AddNullToObject(item, "heap")) ||
+          !(snapshot ? cJSON_AddNumberToObject(item, "minHeap", entry->min_heap)
+                     : cJSON_AddNullToObject(item, "minHeap")) ||
+          !(snapshot ? cJSON_AddNumberToObject(item, "dnsFailures", entry->dns_failures)
+                     : cJSON_AddNullToObject(item, "dnsFailures")) ||
+          !cJSON_AddItemToArray(items, item)) {
+        cJSON_Delete(item);
+        goto history_allocation_failed;
+      }
+    }
+    return json(r, o);
+  history_allocation_failed:
+    cJSON_Delete(o);
+    return error(r, "503 Service Unavailable", "ESP_ERR_NO_MEM",
+                 "Reset history unavailable");
   }
   if (!strcmp(path, "/api/stats") && r->method == HTTP_GET) {
     dns_totals_t totals;
