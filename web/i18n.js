@@ -246,7 +246,7 @@ const messages = {
   "cpuMhz": ["{0} MHz", "{0} MHz"],
   "temperatureC": ["{0} °C", "{0} °C"],
   "resetHistory": ["Lịch sử khởi động lại", "Restart history"],
-  "resetHistoryHelp": ["Tối đa 8 lần boot gần nhất, lưu trên ESP. Thông tin trước reset có thể không có sau mất điện.", "Last 8 boots stored on the ESP. Pre-reset data may be unavailable after power loss."],
+  "resetHistoryHelp": ["8 lần boot gần nhất. JSON kèm log sự cố mạng; có thể thiếu dữ liệu sau mất điện.", "Last 8 boots. JSON includes network diagnostics; power loss may leave gaps."],
   "loadResetHistory": ["Tải lịch sử", "Load history"],
   "downloadResetHistory": ["Tải JSON", "Download JSON"],
   "loadingResetHistory": ["Đang tải lịch sử…", "Loading history…"],

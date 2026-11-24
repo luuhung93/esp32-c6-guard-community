@@ -1,4 +1,5 @@
 #include "network.h"
+#include "diagnostics.h"
 #include "config.h"
 #include "driver/gpio.h"
 #include "esp_event.h"
@@ -76,9 +77,14 @@ static void events(void *arg, esp_event_base_t base, int32_t id, void *data) {
   (void)arg;
   if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START && has_credentials)
     esp_wifi_connect();
+  if (base == WIFI_EVENT && id == WIFI_EVENT_STA_CONNECTED)
+    diagnostics_record(DIAG_WIFI_UP, 0);
+  if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP)
+    diagnostics_record(DIAG_IP_LOST, 0);
   if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
     wifi_event_sta_disconnected_t *event = data;
     ESP_LOGW("network", "Station disconnected: reason=%u", event->reason);
+    diagnostics_record(DIAG_WIFI_DOWN, event->reason);
     ready = false;
     status_led_set(LED_CONNECTED, false);
     unsigned delay = 1u << (retry < 5 ? retry++ : 5);
@@ -90,6 +96,7 @@ static void events(void *arg, esp_event_base_t base, int32_t id, void *data) {
     ip_event_got_ip_t *e = data;
     snprintf(address, 16, IPSTR, IP2STR(&e->ip_info.ip));
     set_resolver();
+    diagnostics_record(DIAG_IP_UP, 0);
     ready = true;
     status_led_set(LED_CONNECTED, true);
     esp_timer_stop(retry_timer);
@@ -251,7 +258,7 @@ esp_err_t network_start(const guard_settings_t *s) {
   ESP_ERROR_CHECK(
       esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, events, NULL));
   ESP_ERROR_CHECK(
-      esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, events, NULL));
+      esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, events, NULL));
   wifi_config_t sta = station_config(s);
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta));

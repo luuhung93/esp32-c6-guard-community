@@ -711,15 +711,15 @@ $("#refresh-reset-history").onclick = () => run(async () => {
     text($("#reset-history-status"), ["resetHistoryFailed"]);
   }
 }, $("#refresh-reset-history"));
-$("#download-reset-history").onclick = () => {
+$("#download-reset-history").onclick = () => run(async () => {
   if (!resetHistoryData) return;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(resetHistoryData, null, 2)], {type: "application/json"}));
+  const url = URL.createObjectURL(new Blob([JSON.stringify({...resetHistoryData, diagnostics: await api("/api/health/diagnostics")}, null, 2)], {type: "application/json"}));
   const link = document.createElement("a");
   link.href = url;
   link.download = "c6-guard-reset-history.json";
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-};
+}, $("#download-reset-history"));
 const networkForm = wireNetwork(api, message);
 const refreshFirmware = wireFirmware(api, run, message, session);
 wireLanguage(() => {

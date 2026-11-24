@@ -18,6 +18,8 @@ guard_health_action_t guard_health_step(guard_health_policy_t *p, bool ok,
 }
 #ifdef ESP_PLATFORM
 #include "dns.h"
+#include "diagnostics.h"
+#include "network.h"
 #include "reset_log.h"
 #include "esp_log.h"
 #include "esp_random.h"
@@ -140,13 +142,18 @@ static void monitor(void *unused) {
       bool eligible = dns_is_ready() && updater_flash_lock();
       if (eligible)
         updater_flash_unlock();
-      bool ok = false;
+      bool ok = false, udp = false, tcp = false;
       if (eligible) {
-        bool udp = probe(false), tcp = probe(true);
+        udp = probe(false);
+        tcp = probe(true);
         ok = udp && tcp;
         if (!ok)
           ESP_LOGW("health", "Local DNS probe failed: UDP=%d TCP=%d", udp, tcp);
       }
+      dns_totals_t totals;
+      dns_totals(&totals);
+      diagnostics_sample(network_ready(), eligible, udp, tcp, totals.errors);
+      diagnostics_flush();
       guard_health_action_t action = guard_health_step(&policy, ok, eligible);
       if (action != HEALTH_WAIT && updater_flash_lock()) {
         if (action == HEALTH_REBOOT) {

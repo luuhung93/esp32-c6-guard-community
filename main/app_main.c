@@ -1,5 +1,6 @@
 #include "config.h"
 #include "dns.h"
+#include "diagnostics.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "filter_store.h"
@@ -57,6 +58,7 @@ void app_main(void) {
     return;
   }
   reset_log_start();
+  diagnostics_start();
   guard_settings_t settings;
   e = guard_settings_load(&settings);
   if (e != ESP_OK) {

@@ -1,5 +1,6 @@
 #include "web.h"
 #include "reset_log.h"
+#include "diagnostics.h"
 #include "cJSON.h"
 #include "config.h"
 #include "dns.h"
@@ -471,6 +472,11 @@ static esp_err_t route(httpd_req_t *r) {
     cJSON_AddNumberToObject(o, "lastDnsRecoveryHeap", recovery->heap);
     cJSON_AddNumberToObject(o, "lastDnsRecoveryMinHeap", recovery->min_heap);
     return json(r, o);
+  }
+  if (!strcmp(path, "/api/health/diagnostics") && r->method == HTTP_GET) {
+    cJSON *o = diagnostics_json();
+    return o ? json(r, o) : error(r, "503 Service Unavailable", "ESP_ERR_NO_MEM",
+                                  "Diagnostics unavailable");
   }
   if (!strcmp(path, "/api/health/history") && r->method == HTTP_GET) {
     const reset_history_t *history = reset_log_history();
