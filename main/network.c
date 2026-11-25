@@ -79,8 +79,11 @@ static void events(void *arg, esp_event_base_t base, int32_t id, void *data) {
     esp_wifi_connect();
   if (base == WIFI_EVENT && id == WIFI_EVENT_STA_CONNECTED)
     diagnostics_record(DIAG_WIFI_UP, 0);
-  if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP)
+  if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP) {
+    ready = false;
+    status_led_set(LED_CONNECTED, false);
     diagnostics_record(DIAG_IP_LOST, 0);
+  }
   if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
     wifi_event_sta_disconnected_t *event = data;
     ESP_LOGW("network", "Station disconnected: reason=%u", event->reason);

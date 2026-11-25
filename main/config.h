@@ -1,5 +1,5 @@
 #pragma once
-#define GUARD_VERSION "0.2.26"
+#define GUARD_VERSION "0.2.27"
 #define GUARD_DNS_MAX 4096
 #define GUARD_PENDING_MAX 2
 #define GUARD_TCP_MAX 2
